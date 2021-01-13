@@ -12,6 +12,8 @@ import {connect} from 'react-redux';
 import {iconLogo} from '../../Assets';
 import {v4 as uuidv4} from 'uuid';
 import {Button, Gap, Input, Link} from '../../Component';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import {messageAlert} from '../../utils/Message';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -45,9 +47,24 @@ class RegisterScreen extends Component {
       if (this.state.password != this.state.confirm) {
         messageAlert('Warning', 'Password must be same', 'warning');
       } else {
-        this.props.addUser(this.state);
-        this.props.navigation.navigate('Login');
-        messageAlert('Congrats!', 'Your account is created', 'success');
+        auth()
+          .createUserWithEmailAndPassword(this.state.email, this.state.password)
+          .then((res) => {
+            const user = res.user;
+            this.props.addUser(this.state);
+            firestore()
+              .collection('Users')
+              .doc(user.uid)
+              .set(user.providerData[0])
+              .then((response) => {
+                messageAlert('Congrats!', 'Your account is created', 'success');
+                this.props.navigation.navigate('Login');
+              });
+          })
+          .catch((err) => {
+            const error = err.message;
+            messageAlert('Failed', error, 'danger');
+          });
       }
     }
   }

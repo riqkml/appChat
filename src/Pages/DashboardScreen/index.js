@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Text, StyleSheet, View} from 'react-native';
 import {connect} from 'react-redux';
-import {Header} from '../../Component';
+import {CustomText, Header} from '../../Component';
 
 class DashboardScreen extends Component {
   render() {
@@ -9,6 +9,7 @@ class DashboardScreen extends Component {
     return (
       <View style={{flex: 1, backgroundColor: 'white'}}>
         <Header name={dataUser.user} email={dataUser.email} />
+        <CustomText>{JSON.stringify(dataUser)}</CustomText>
       </View>
     );
   }

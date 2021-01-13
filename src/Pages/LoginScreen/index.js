@@ -12,14 +12,16 @@ import {connect} from 'react-redux';
 import {iconLogo} from '../../Assets';
 import {Button, Gap, Input, Link} from '../../Component';
 import {messageAlert} from '../../utils/Message';
+import auth from '@react-native-firebase/auth';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 class LoginScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: '',
+      email: '',
       password: '',
+      providerData: {},
     };
   }
 
@@ -29,25 +31,40 @@ class LoginScreen extends Component {
     });
   }
   _submitData() {
-    const {user, password} = this.state;
+    const {email, password} = this.state;
     const {dataLogin, navigation} = this.props;
-    if (user == '' || password == '') {
+    if (email == '' || password == '') {
       messageAlert('Alert', 'incomplete form', 'danger');
     } else {
-      const loginUser = dataLogin.filter((data) => data.user == user);
+      const loginUser = dataLogin.filter((data) => data.email == email);
       if (password == loginUser[0].pass) {
-        messageAlert('Login', `welcome, ${user}`, 'success');
-        const data = loginUser[0];
-        this.props.loginUser({
-          id: data.id,
-          user: data.user,
-          email: data.email,
-        });
-        navigation.replace('Dashboard');
+        auth()
+          .signInWithEmailAndPassword(email, password)
+          .then((res) => {
+            const userData = res.user.providerData[0];
+            this.setState({providerData: userData});
+            messageAlert('Login', `welcome, ${email}`, 'success');
+            const data = loginUser[0];
+            this.props.loginUser({
+              id: data.id,
+              user: data.user,
+              ...userData,
+            });
+            navigation.replace('Dashboard');
+          })
+          .catch((err) => {
+            console.log('error', err);
+          });
       } else {
         messageAlert('Alert', 'Wrong Password', 'danger');
       }
     }
+  }
+  componentDidMount() {
+    const subcriber = auth().onAuthStateChanged((user) => {
+      this.props.navigation.navigate(user ? 'Dashboard' : 'Login');
+    });
+    return subcriber;
   }
   render() {
     const {navigation} = this.props;
@@ -68,10 +85,10 @@ class LoginScreen extends Component {
             </View>
             <View style={styles.bottomSide}>
               <Input
-                icon="user"
-                onChangeText={(e) => this._tempData('user', e)}
-                sizeIcon={33}
-                label="Username"
+                icon="envelope"
+                onChangeText={(e) => this._tempData('email', e)}
+                sizeIcon={25}
+                label="Email"
               />
               <Gap height={height * 0.01} />
               <Input
