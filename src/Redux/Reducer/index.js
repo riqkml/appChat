@@ -1,3 +1,4 @@
-import usersReducer from "./usersReducer";
-import authReducer from "./authReducer";
-export { usersReducer, authReducer };
+import usersReducer from './usersReducer';
+import authReducer from './authReducer';
+import chatReducer from './chatReducer';
+export {usersReducer, authReducer, chatReducer};

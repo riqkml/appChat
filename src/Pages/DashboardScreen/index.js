@@ -1,15 +1,23 @@
 import React, {Component} from 'react';
-import {Text, StyleSheet, View} from 'react-native';
+import {Text, StyleSheet, View, Image} from 'react-native';
+import FastImage from 'react-native-fast-image';
 import {connect} from 'react-redux';
-import {CustomText, Header} from '../../Component';
+import {iconLogo, People} from '../../Assets';
+import {ChatList, CustomText, Header} from '../../Component';
 
 class DashboardScreen extends Component {
   render() {
-    const {dataUser} = this.props;
+    const {dataUser, navigation} = this.props;
     return (
       <View style={{flex: 1, backgroundColor: 'white'}}>
-        <Header name={dataUser.user} email={dataUser.email} />
-        <CustomText>{JSON.stringify(dataUser)}</CustomText>
+        <Header label="Chatting" />
+        <ChatList onPress={() => navigation.navigate('Chatting')} />
+        <ChatList />
+        <ChatList />
+        <ChatList />
+        <ChatList />
+        <ChatList />
+        <ChatList />
       </View>
     );
   }

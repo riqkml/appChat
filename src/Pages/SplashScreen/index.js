@@ -2,8 +2,10 @@ import React, {Component} from 'react';
 import {Text, StyleSheet, View, Image} from 'react-native';
 import {iconLogo} from '../../Assets';
 import auth from '@react-native-firebase/auth';
-
-export default class SplashScreen extends Component {
+import firestore from '@react-native-firebase/firestore';
+import {storeData} from '../../utils';
+import {connect} from 'react-redux';
+class SplashScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -12,11 +14,21 @@ export default class SplashScreen extends Component {
     };
   }
   componentDidMount() {
-    auth().onAuthStateChanged((user) => {
+    auth().onAuthStateChanged(async (user) => {
       if (user) {
-        setTimeout(() => {
-          this.props.navigation.replace('Dashboard');
-        }, 3000);
+        const id = user.uid;
+        const request = await firestore()
+          .collection('Users')
+          .where('uid', '==', id)
+          .get();
+        if (request) {
+          const detail = request._docs[0]._data;
+          this.props.userDetail(detail);
+          storeData('uDetail', detail);
+          setTimeout(() => {
+            this.props.navigation.replace('mainApp');
+          }, 3000);
+        }
       } else {
         setTimeout(() => {
           this.props.navigation.replace('Login');
@@ -39,7 +51,20 @@ export default class SplashScreen extends Component {
     );
   }
 }
-
+const mapStateToProps = (state) => {
+  return {};
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    userDetail: (value) => {
+      dispatch({
+        type: 'LOGIN-USER',
+        userLogin: value,
+      });
+    },
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(SplashScreen);
 const styles = StyleSheet.create({
   label: {fontSize: 18, letterSpacing: 1, fontWeight: 'bold'},
   page: {flex: 1, backgroundColor: 'white'},

@@ -4,7 +4,6 @@ const authData = {
 };
 
 const authReducer = (state = authData, action) => {
-  console.log('reducerauth', action);
   switch (action.type) {
     case 'LOGIN-USER':
       return {

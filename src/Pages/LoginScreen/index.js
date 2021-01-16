@@ -36,36 +36,26 @@ class LoginScreen extends Component {
     if (email == '' || password == '') {
       messageAlert('Alert', 'incomplete form', 'danger');
     } else {
-      const loginUser = dataLogin.filter((data) => data.email == email);
-      if (password == loginUser[0].pass) {
-        auth()
-          .signInWithEmailAndPassword(email, password)
-          .then((res) => {
-            const userData = res.user.providerData[0];
-            this.setState({providerData: userData});
-            messageAlert('Login', `welcome, ${email}`, 'success');
-            const data = loginUser[0];
-            this.props.loginUser({
-              id: data.id,
-              user: data.user,
+      auth()
+        .signInWithEmailAndPassword(email, password)
+        .then((res) => {
+          const userData = res.user.providerData[0];
+          this.setState({providerData: userData});
+          messageAlert('Login', `welcome, ${email}`, 'success');
+          this.props.loginUser({
+            user: {
               ...userData,
-            });
-            navigation.replace('Dashboard');
-          })
-          .catch((err) => {
-            console.log('error', err);
+            },
           });
-      } else {
-        messageAlert('Alert', 'Wrong Password', 'danger');
-      }
+          navigation.replace('mainApp');
+        })
+        .catch((error) => {
+          const errorMessage = error.message;
+          messageAlert('Alert', errorMessage, 'danger');
+        });
     }
   }
-  componentDidMount() {
-    const subcriber = auth().onAuthStateChanged((user) => {
-      this.props.navigation.navigate(user ? 'Dashboard' : 'Login');
-    });
-    return subcriber;
-  }
+
   render() {
     const {navigation} = this.props;
     const routeLogin = () => {

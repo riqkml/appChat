@@ -51,6 +51,8 @@ class RegisterScreen extends Component {
           .createUserWithEmailAndPassword(this.state.email, this.state.password)
           .then((res) => {
             const user = res.user;
+            user.providerData[0].displayName = this.state.user;
+            user.providerData[0].uid = user.uid;
             this.props.addUser(this.state);
             firestore()
               .collection('Users')
@@ -58,7 +60,7 @@ class RegisterScreen extends Component {
               .set(user.providerData[0])
               .then((response) => {
                 messageAlert('Congrats!', 'Your account is created', 'success');
-                this.props.navigation.navigate('Login');
+                // this.props.navigation.navigate('Login');
               });
           })
           .catch((err) => {
