@@ -13,7 +13,7 @@ export default class ChatItem extends Component {
     if (isMe) {
       return <User text={text} time={time} key={key} />;
     } else {
-      return <Other />;
+      return <Other text={text} time={time} key={key} />;
     }
   }
 }

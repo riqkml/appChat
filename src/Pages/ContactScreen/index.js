@@ -46,7 +46,9 @@ class ContactScreen extends Component {
               data={item}
               onClick={() => {
                 otherData(item);
-                navigation.navigate('Chatting');
+                navigation.navigate('Chatting', {
+                  isReply: false,
+                });
               }}
             />
           )}

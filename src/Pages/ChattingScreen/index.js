@@ -22,72 +22,88 @@ class ChattingScreen extends Component {
   }
   _chatSend() {
     const {content} = this.state;
-    const {userData, otherData} = this.props;
+    const {userData, otherData, route} = this.props;
     const today = new Date();
+    const idDoc = getDateTime(today);
+    const isReply = this.props.route.params.isReply;
+    const chatId = `${userData.uid}_${otherData.uid}`;
+    const chatIdReply = route.params.roomRef;
     const dataChat = {
       sendBy: userData.uid,
       chatDate: today.getTime(),
       chatTime: getChatTime(today),
       chat: content,
+      isDate: idDoc,
       isDeleteUser: false,
       isDeleteOther: false,
     };
+    if (content) {
+      firestore()
+        .collection('Chatting')
+        .doc(chatIdReply ? chatIdReply : chatId)
+        .collection('allChat')
+        .add(dataChat);
+
+      //user
+      const forUser = {
+        ...otherData,
+        lastChatTime: today.getTime(),
+        isReply: isReply ? true : false,
+        lastChat: content,
+        roomRef: chatIdReply ? chatIdReply : chatId,
+      };
+      firestore()
+        .collection('Messages')
+        .doc(`${userData.uid}`)
+        .collection('History')
+        .doc(`${otherData.uid}`)
+        // .update(forUser);
+        .set(forUser);
+      //user
+
+      const forOther = {
+        lastChat: content,
+        lastChatTime: today.getTime(),
+        isReply: isReply ? true : false,
+        roomRef: chatIdReply ? chatIdReply : chatId,
+        ...userData,
+      };
+      console.log('for user', forUser, forOther);
+      firestore()
+        .collection('Messages')
+        .doc(`${otherData.uid}`)
+        .collection('History')
+        .doc(`${userData.uid}`)
+        // .update(forUser);
+        .set(forOther);
+
+      this.setState({content: ''});
+    } else {
+      this.setState({content: ''});
+    }
+  }
+  _getChatting() {
+    const {userData, otherData, route} = this.props;
+    const today = new Date();
+    const isReply = this.props.route.params.isReply;
+    const chatId = `${userData.uid}_${otherData.uid}`;
+    const chatIdReply = route.params.roomRef;
     const idDoc = getDateTime(today);
     firestore()
       .collection('Chatting')
-      .doc(`${userData.uid}_${otherData.uid}`)
+      .doc(chatIdReply ? chatIdReply : chatId)
       .collection('allChat')
-      .doc(idDoc)
-      .collection('Today')
-      .add(dataChat);
-    this.setState({content: ''});
-  }
-  _getChatting() {
-    const {userData, otherData} = this.props;
-    const today = new Date();
-    const idDoc = getDateTime(today);
-    firestore()
-      .collectionGroup(`Today`)
       .onSnapshot((querySnapshot) => {
-        const currId = `${userData.uid}_${otherData.uid}`;
         let newDataChat = [];
-        const newDataDate = [];
-        let tempDate = '';
         querySnapshot.docs.forEach((documentSnapshot) => {
-          const ref = documentSnapshot.ref._documentPath._parts[5];
-          const refDate = documentSnapshot.ref._documentPath._parts[3];
-          const refId = documentSnapshot.ref._documentPath._parts[1];
-          const idDoc = getDateTime(today);
           const data = documentSnapshot.data();
-          tempDate = refDate;
-          if (refId == currId) {
-            if (newDataChat.length > 0) {
-              console.log('error', newDataChat.length, newDataChat);
-              const findId = newDataChat.findIndex(
-                (finder) => finder.id == refDate,
-              );
-              if (findId !== -1) {
-                newDataChat[findId].data[
-                  newDataChat[findId].data.length
-                ] = data;
-                newDataChat[findId].data.sort((a, b) =>
-                  a.chatDate > b.chatDate ? 1 : -1,
-                );
-              }
-            } else {
-              const initData = {
-                id: refDate,
-                data: [data],
-              };
-              newDataChat = [initData];
-            }
-          }
+          newDataChat = [...newDataChat, data];
         });
-        if (newDataChat.length != 0) {
-          this.setState({chatData: newDataChat});
-        } else {
-          this.setState({chatData: []});
-        }
+        this.setState({
+          chatData: newDataChat.sort((a, b) =>
+            a.chatDate > b.chatDate ? 1 : -1,
+          ),
+        });
       });
   }
   componentDidMount() {
@@ -96,40 +112,36 @@ class ChattingScreen extends Component {
   render() {
     const {chatData} = this.state;
     const {navigation, otherData, userData} = this.props;
+    const isReply = this.props.route.params.isReply;
     const {email, displayName, uid} = otherData;
-    const {text} = this.state;
-    console.log('chat', this.state.chatData);
+    const {content} = this.state;
     return (
       <View style={{flex: 1, backgroundColor: colors.white}}>
         <Header
-          goBack={() => navigation.goBack()}
+          goBack={() => navigation.navigate('mainApp')}
           photo={People}
           name={displayName}
           isChatting
         />
         <View style={styles.content}>
-          <ScrollView>
-            {chatData.map((val, key) => {
-              return (
-                <View style={styles.chatbox}>
-                  <Text style={styles.date}>{val.id}</Text>
-                  {val.data.sort().map((item, key) => {
-                    return (
-                      <ChatItem
-                        text={item.chat}
-                        time={item.chatTime}
-                        key={key}
-                        isMe={item.sendBy === userData.uid}
-                      />
-                    );
-                  })}
-                </View>
-              );
-            })}
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.chatbox}>
+              {chatData.map((item, key) => {
+                return (
+                  <ChatItem
+                    text={item.chat}
+                    time={item.chatTime}
+                    key={item.chatDate}
+                    isMe={item.sendBy === userData.uid}
+                  />
+                );
+              })}
+            </View>
           </ScrollView>
         </View>
         <InputChat
-          value={text}
+          label={displayName}
+          value={content}
           onChangeText={(e) => {
             this.setState({content: e});
           }}

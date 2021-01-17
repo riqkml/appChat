@@ -18,7 +18,7 @@ export default class User extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: 5,
     alignItems: 'flex-end',
   },
   time: {

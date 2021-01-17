@@ -12,14 +12,14 @@ import {colors} from '../../utils';
 
 export default class InputChat extends Component {
   render() {
-    const {onPress, value, onChangeText} = this.props;
+    const {onPress, value, onChangeText, label} = this.props;
     return (
       <View style={styles.container}>
         <TextInput
           style={styles.inputchat}
           value={value}
           onChangeText={onChangeText}
-          placeholder="Tulis pesan untuk Mary"
+          placeholder={`Tulis pesan untuk ${label}`}
         />
         <TouchableHighlight>
           <TouchableOpacity onPress={onPress}>

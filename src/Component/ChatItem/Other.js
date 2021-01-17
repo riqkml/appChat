@@ -4,14 +4,13 @@ import {colors, fonts} from '../../utils';
 
 export default class Other extends Component {
   render() {
+    const {text, time, key} = this.props;
     return (
-      <View style={styles.container}>
+      <View key={key} style={styles.container}>
         <View style={styles.chatContent}>
-          <Text style={styles.text}>
-            Mana mungkin selimut tetangga, hangat hangat dingin banget?
-          </Text>
+          <Text style={styles.text}>{text}</Text>
         </View>
-        <Text style={styles.time}>4.20 AM</Text>
+        <Text style={styles.time}>{time}</Text>
       </View>
     );
   }
@@ -19,7 +18,7 @@ export default class Other extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: 5,
     alignItems: 'flex-start',
   },
   time: {

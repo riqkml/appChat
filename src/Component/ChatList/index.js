@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {Gap} from '..';
 import {People} from '../../Assets';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {colors, fonts} from '../../utils';
 const d = new Date();
 const n = d.getHours().toString();
@@ -16,10 +17,11 @@ const m = d.getMinutes().toString();
 const q = n + ':' + m;
 export default class ChatList extends Component {
   render() {
-    const {onPress} = this.props;
+    const {onPress, name, lastChat, key, isReply} = this.props;
     return (
       <TouchableHighlight activeOpacity={0.6} underlayColor="#DDDDDD">
         <TouchableOpacity
+          key={key}
           onPress={onPress}
           style={{
             padding: 20,
@@ -52,18 +54,27 @@ export default class ChatList extends Component {
                   fontSize: 16,
                   paddingBottom: 5,
                 }}>
-                Mary Joe
+                {name}
               </Text>
               <Gap height={2} />
-              <Text
-                style={{
-                  color: colors.ternary,
-                  fontFamily: fonts.regular,
-                  fontSize: 12,
-                }}
-                numberOfLines={1}>
-                "aweaweaweaw aweaweawea aweawea"
-              </Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                {isReply && (
+                  <View style={{marginRight: 5}}>
+                    <Icon name="check" size={15} color={colors.ternary} />
+                  </View>
+                )}
+                <View>
+                  <Text
+                    style={{
+                      color: colors.ternary,
+                      fontFamily: fonts.regular,
+                      fontSize: 12,
+                    }}
+                    numberOfLines={1}>
+                    {lastChat}
+                  </Text>
+                </View>
+              </View>
             </View>
             <View>
               <Text>{q}</Text>
