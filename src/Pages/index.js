@@ -4,6 +4,7 @@ import SplashScreen from './SplashScreen';
 import DashboardScreen from './DashboardScreen';
 import ChattingScreen from './ChattingScreen';
 import ContactScreen from './ContactScreen';
+import ProfileScreen from './ProfileScreen';
 
 export {
   LoginScreen,
@@ -12,4 +13,5 @@ export {
   SplashScreen,
   ChattingScreen,
   DashboardScreen,
+  ProfileScreen,
 };

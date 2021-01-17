@@ -3,7 +3,7 @@ import {Text, StyleSheet, View, Image} from 'react-native';
 import {iconLogo} from '../../Assets';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {storeData} from '../../utils';
+import {colors, fonts, storeData} from '../../utils';
 import {connect} from 'react-redux';
 class SplashScreen extends Component {
   constructor(props) {
@@ -40,12 +40,8 @@ class SplashScreen extends Component {
     return (
       <View style={styles.page}>
         <View style={styles.container}>
-          <View>
-            <Image source={iconLogo} />
-          </View>
-          <View>
-            <Text style={styles.label}>Salt Academy App</Text>
-          </View>
+          <Text style={styles.label}>K-onnect</Text>
+          <Text style={styles.subLabel}>Simple App Messaging</Text>
         </View>
       </View>
     );
@@ -66,7 +62,18 @@ const mapDispatchToProps = (dispatch) => {
 };
 export default connect(mapStateToProps, mapDispatchToProps)(SplashScreen);
 const styles = StyleSheet.create({
-  label: {fontSize: 18, letterSpacing: 1, fontWeight: 'bold'},
-  page: {flex: 1, backgroundColor: 'white'},
+  label: {
+    color: colors.white,
+    fontFamily: fonts.bold,
+    fontSize: 45,
+    letterSpacing: 0.5,
+  },
+  subLabel: {
+    color: colors.white,
+    fontFamily: fonts.bold,
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+  page: {flex: 1, backgroundColor: colors.primary},
   container: {flex: 1, justifyContent: 'center', alignItems: 'center'},
 });

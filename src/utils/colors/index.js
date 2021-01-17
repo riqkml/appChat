@@ -1,5 +1,5 @@
 const pallete = {
-  darkblue: '#2F3B8F',
+  darkblue: '#1F65FF',
   sky: '#259DCF',
   white: '#ffffff',
   algaegreen: '#26CC64',

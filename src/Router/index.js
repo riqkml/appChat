@@ -9,6 +9,7 @@ import {
   DashboardScreen,
   ChattingScreen,
   ContactScreen,
+  ProfileScreen,
 } from '../Pages';
 import {colors, fonts} from '../utils';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -47,6 +48,17 @@ export default class Router extends Component {
             tabBarColor: '#D02760',
             tabBarIcon: ({color}) => (
               <MaterialCommunityIcons name="book" color={color} size={26} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            tabBarLabel: 'Profile',
+            tabBarColor: '#1F65FF',
+            tabBarIcon: ({color}) => (
+              <MaterialCommunityIcons name="account" color={color} size={26} />
             ),
           }}
         />

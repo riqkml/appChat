@@ -12,7 +12,10 @@ import {connect} from 'react-redux';
 import {iconLogo} from '../../Assets';
 import {Button, Gap, Input, Link} from '../../Component';
 import {messageAlert} from '../../utils/Message';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import {colors, fonts} from '../../utils';
+import messaging from '@react-native-firebase/messaging';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 class LoginScreen extends Component {
@@ -38,7 +41,7 @@ class LoginScreen extends Component {
     } else {
       auth()
         .signInWithEmailAndPassword(email, password)
-        .then((res) => {
+        .then(async (res) => {
           const userData = res.user.providerData[0];
           this.setState({providerData: userData});
           messageAlert('Login', `welcome, ${email}`, 'success');
@@ -47,6 +50,8 @@ class LoginScreen extends Component {
               ...userData,
             },
           });
+          const userToken = await messaging().getToken();
+          userToken && this._saveTokenToDatabase(userToken);
           navigation.replace('mainApp');
         })
         .catch((error) => {
@@ -55,19 +60,26 @@ class LoginScreen extends Component {
         });
     }
   }
-
+  async _saveTokenToDatabase(token) {
+    // Assume user is already signed in
+    const userId = auth().currentUser.uid;
+    console.log('userid', userId);
+    // Add the token to the users datastore
+    await firestore()
+      .collection('Users')
+      .doc(userId)
+      .update({
+        tokens: firestore.FieldValue.arrayUnion(token),
+      });
+  }
   render() {
     const {navigation} = this.props;
-    const routeLogin = () => {
-      navigation.navigate('Register');
-    };
     return (
       <View style={styles.page}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.container}>
             <View style={styles.topSide}>
-              <Image source={iconLogo} style={styles.logoImg} />
-              <Text style={styles.label}>Salt Academy App</Text>
+              <Text style={styles.label}>K-onnect</Text>
               <Gap height={15} />
               <Text style={styles.subLabel}>
                 Please login with a registered account
@@ -89,7 +101,7 @@ class LoginScreen extends Component {
                 secure
                 isPassword
               />
-              <Gap height={20} />
+              <Gap height={60} />
               <Button
                 label="Login"
                 margin={20}
@@ -97,11 +109,10 @@ class LoginScreen extends Component {
               />
             </View>
             <View style={styles.linkSide}>
-              <Link title="Forgot Password ? " link="Reset Password" />
               <Link
                 title="Don't have an account ? "
                 link="Sign Up"
-                click={routeLogin}
+                click={() => navigation.navigate('Register')}
               />
             </View>
           </View>
@@ -131,6 +142,7 @@ const mapDispatchToProps = (dispatch) => {
 };
 export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
 const styles = StyleSheet.create({
+  bottomSide: {flex: 1, paddingVertical: 20},
   linkMainLabel: {fontSize: 14},
   page: {
     flex: 1,
@@ -144,14 +156,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   topSide: {
+    flex: 1,
+    backgroundColor: 'white',
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 80,
     paddingBottom: 40,
   },
   logoImg: {width: width * 0.3, height: height * 0.3},
-  label: {fontSize: 16, fontWeight: 'bold'},
+  label: {
+    color: colors.primary,
+    fontFamily: fonts.bold,
+    fontSize: 45,
+    letterSpacing: 0.5,
+  },
   subLabel: {fontSize: 16},
   linkSide: {
+    flex: 1,
     marginVertical: 60,
   },
 });

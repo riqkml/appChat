@@ -1,5 +1,6 @@
-import React, { Component } from "react";
-import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
+import React, {Component} from 'react';
+import {Text, StyleSheet, View, TouchableOpacity} from 'react-native';
+import {colors} from '../../utils';
 
 export default class Link extends Component {
   render() {
@@ -17,7 +18,7 @@ export default class Link extends Component {
 }
 
 const styles = StyleSheet.create({
-  linkContainer: { flexDirection: "row", alignItems: "center" },
-  linkLabel: { color: "#2F3B8F", fontWeight: "600", fontSize: 16 },
-  linkMainLabel: { fontSize: 14 },
+  linkContainer: {flexDirection: 'row', alignItems: 'center'},
+  linkLabel: {color: colors.primary, fontWeight: '600', fontSize: 16},
+  linkMainLabel: {fontSize: 14},
 });

@@ -7,9 +7,9 @@ import {colors, fonts} from '../../utils';
 
 export default class Header extends Component {
   render() {
-    const {name, email, photo, isChatting, goBack, label} = this.props;
+    const {name, email, photo, isChatting, goBack, label, spacing} = this.props;
     return (
-      <View style={styles.headerWrapper}>
+      <View style={styles.headerWrapper(spacing)}>
         {isChatting && (
           <TouchableHighlight
             activeOpacity={0.6}
@@ -27,7 +27,7 @@ export default class Header extends Component {
             <View style={styles.avatarWrapper}>
               <Image
                 source={photo}
-                style={{width: 50, height: 50, borderRadius: 25}}
+                style={{width: 40, height: 40, borderRadius: 20}}
               />
               <View style={styles.status} />
             </View>
@@ -61,16 +61,16 @@ const styles = StyleSheet.create({
     flex: 3,
     alignItems: isChatting ? 'flex-start' : 'flex-start',
   }),
-  headerWrapper: {
+  headerWrapper: (spacing) => ({
     backgroundColor: colors.white,
-    paddingVertical: 15,
+    paddingVertical: spacing ? spacing : 5,
     flexDirection: 'row',
     paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',
     // borderBottomWidth: 1,
     // borderBottomColor: colors.ternary,
-  },
+  }),
   avatarWrapper: {
     backgroundColor: colors.user.border,
     width: 57,
@@ -92,12 +92,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   status: {
-    width: 15,
-    height: 15,
+    width: 10,
+    height: 10,
     borderRadius: 8,
     position: 'absolute',
-    bottom: 0,
-    right: 6,
+    bottom: 8,
+    right: 8,
     backgroundColor: colors.user.online,
   },
 });

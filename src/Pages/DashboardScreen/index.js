@@ -44,17 +44,17 @@ class DashboardScreen extends Component {
     const {listChat} = this.state;
     return (
       <View style={{flex: 1, backgroundColor: 'white'}}>
-        <Header label="Chatting" />
+        <Header label="Chatting" spacing={15} />
         <ScrollView>
           {listChat &&
             listChat.map((item, key) => {
-              console.log('item', item);
               return (
                 <ChatList
                   key={key}
                   lastChat={item.lastChat}
                   name={item.displayName}
                   isReply={item.isReply}
+                  time={item.lastChatTimeShort}
                   onPress={() => {
                     navigation.navigate('Chatting', {
                       roomRef: item.roomRef,

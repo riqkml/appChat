@@ -11,6 +11,7 @@ import {
   getChatDocument,
 } from '../../utils';
 import firestore from '@react-native-firebase/firestore';
+import Axios from 'axios';
 class ChattingScreen extends Component {
   constructor(props) {
     super(props);
@@ -22,8 +23,9 @@ class ChattingScreen extends Component {
   }
   _chatSend() {
     const {content} = this.state;
-    const {userData, otherData, route} = this.props;
+    const {userData, otherData, route, apiKey} = this.props;
     const today = new Date();
+
     const idDoc = getDateTime(today);
     const isReply = this.props.route.params.isReply;
     const chatId = `${userData.uid}_${otherData.uid}`;
@@ -37,6 +39,29 @@ class ChattingScreen extends Component {
       isDeleteUser: false,
       isDeleteOther: false,
     };
+    const receiverToken = otherData.tokens[0];
+    const dataNotif = {
+      to: receiverToken,
+      collapse_key: 'type_a',
+      notification: {
+        title: userData.displayName,
+        body: content,
+      },
+      data: {
+        body: 'Body of Your Notification in Data',
+        title: 'Title of Your Notification in Title',
+        key_1: 'Value for key_1',
+        key_2: 'Value for key_2',
+      },
+    };
+    const configAPI = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization:
+          'key=AAAAi2M3DSw:APA91bHrglbRNtvyLu9IFEXF0gZC_b5Szbf7FHDuiULULQI_JEmq24FT1bUnJNBw7zkxfnujJKuNHponsL2D58oXkKO9wovgsuPBJnATlrTbHBT04wsCo9AKDUrzldi5xVXmmffhMl_c',
+      },
+    };
+    console.log('config', this.props);
     if (content) {
       firestore()
         .collection('Chatting')
@@ -48,6 +73,7 @@ class ChattingScreen extends Component {
       const forUser = {
         ...otherData,
         lastChatTime: today.getTime(),
+        lastChatTimeShort: getChatTime(today, true),
         isReply: isReply ? true : false,
         lastChat: content,
         roomRef: chatIdReply ? chatIdReply : chatId,
@@ -64,6 +90,7 @@ class ChattingScreen extends Component {
       const forOther = {
         lastChat: content,
         lastChatTime: today.getTime(),
+        lastChatTimeShort: getChatTime(today, true),
         isReply: isReply ? true : false,
         roomRef: chatIdReply ? chatIdReply : chatId,
         ...userData,
@@ -76,7 +103,7 @@ class ChattingScreen extends Component {
         .doc(`${userData.uid}`)
         // .update(forUser);
         .set(forOther);
-
+      Axios.post('https://fcm.googleapis.com/fcm/send', dataNotif, configAPI);
       this.setState({content: ''});
     } else {
       this.setState({content: ''});
@@ -115,6 +142,7 @@ class ChattingScreen extends Component {
     const isReply = this.props.route.params.isReply;
     const {email, displayName, uid} = otherData;
     const {content} = this.state;
+    console.log('date', chatData);
     return (
       <View style={{flex: 1, backgroundColor: colors.white}}>
         <Header
@@ -157,6 +185,7 @@ const mapStateToProps = (state) => {
   return {
     otherData: state.chatReducer.otherData,
     userData: state.authReducer.userLoginData,
+    apiKey: state.authReducer.fireStoreKey,
   };
 };
 const mapDispatchToProps = () => {
