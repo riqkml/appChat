@@ -1,21 +1,22 @@
 import React, {Component} from 'react';
-import {Text, StyleSheet, View, ScrollView, FlatList} from 'react-native';
+import {StyleSheet, View, ScrollView, Alert} from 'react-native';
 import {connect} from 'react-redux';
 import {People} from '../../Assets';
 import {ChatItem, Header, InputChat} from '../../Component';
+import auth from '@react-native-firebase/auth';
 import {
   colors,
+  configAPI,
   fonts,
   getChatTime,
   getDateTime,
-  getChatDocument,
+  notificationData,
 } from '../../utils';
 import firestore from '@react-native-firebase/firestore';
 import Axios from 'axios';
 class ChattingScreen extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       content: '',
       chatData: [],
@@ -25,105 +26,79 @@ class ChattingScreen extends Component {
     const {content} = this.state;
     const {userData, otherData, route, apiKey} = this.props;
     const today = new Date();
-
     const idDoc = getDateTime(today);
-    const isReply = this.props.route.params.isReply;
-    const chatId = `${userData.uid}_${otherData.uid}`;
-    const chatIdReply = route.params.roomRef;
+    const userId = auth().currentUser.uid;
     const dataChat = {
       sendBy: userData.uid,
       chatDate: today.getTime(),
       chatTime: getChatTime(today),
       chat: content,
       isDate: idDoc,
-      isDeleteUser: false,
-      isDeleteOther: false,
     };
-    const receiverToken = otherData.tokens[0];
-    const dataNotif = {
-      to: receiverToken,
-      collapse_key: 'type_a',
-      notification: {
-        title: userData.displayName,
-        body: content,
-      },
-      data: {
-        body: 'Body of Your Notification in Data',
-        title: 'Title of Your Notification in Title',
-        key_1: 'Value for key_1',
-        key_2: 'Value for key_2',
-      },
+    const receiverToken = otherData.tokens ? otherData.tokens[0] : '';
+
+    const forUser = {
+      ...otherData,
+      lastChatTime: today.getTime(),
+      lastChatTimeShort: getChatTime(today, true),
+      lastChat: content,
     };
-    const configAPI = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization:
-          'key=AAAAi2M3DSw:APA91bHrglbRNtvyLu9IFEXF0gZC_b5Szbf7FHDuiULULQI_JEmq24FT1bUnJNBw7zkxfnujJKuNHponsL2D58oXkKO9wovgsuPBJnATlrTbHBT04wsCo9AKDUrzldi5xVXmmffhMl_c',
-      },
+    const forOther = {
+      lastChatTime: today.getTime(),
+      lastChatTimeShort: getChatTime(today, true),
+      lastChat: content,
+      ...userData,
     };
-    console.log('config', this.props);
     if (content) {
       firestore()
         .collection('Chatting')
-        .doc(chatIdReply ? chatIdReply : chatId)
-        .collection('allChat')
+        .doc(userId)
+        .collection(otherData.uid)
         .add(dataChat);
-
-      //user
-      const forUser = {
-        ...otherData,
-        lastChatTime: today.getTime(),
-        lastChatTimeShort: getChatTime(today, true),
-        isReply: isReply ? true : false,
-        lastChat: content,
-        roomRef: chatIdReply ? chatIdReply : chatId,
-      };
+      firestore()
+        .collection('Chatting')
+        .doc(otherData.uid)
+        .collection(userId)
+        .add(dataChat);
+      firestore()
+        .collection('Messages')
+        .doc(`${otherData.uid}`)
+        .collection('History')
+        .doc(`${userData.uid}`)
+        .set(forOther);
       firestore()
         .collection('Messages')
         .doc(`${userData.uid}`)
         .collection('History')
         .doc(`${otherData.uid}`)
-        // .update(forUser);
         .set(forUser);
       //user
-
-      const forOther = {
-        lastChat: content,
-        lastChatTime: today.getTime(),
-        lastChatTimeShort: getChatTime(today, true),
-        isReply: isReply ? true : false,
-        roomRef: chatIdReply ? chatIdReply : chatId,
-        ...userData,
-      };
-      console.log('for user', forUser, forOther);
-      firestore()
-        .collection('Messages')
-        .doc(`${otherData.uid}`)
-        .collection('History')
-        .doc(`${userData.uid}`)
-        // .update(forUser);
-        .set(forOther);
-      Axios.post('https://fcm.googleapis.com/fcm/send', dataNotif, configAPI);
+      Axios.post(
+        'https://fcm.googleapis.com/fcm/send',
+        notificationData(userData.displayName, content, receiverToken),
+        configAPI,
+      );
       this.setState({content: ''});
     } else {
       this.setState({content: ''});
     }
   }
   _getChatting() {
-    const {userData, otherData, route} = this.props;
-    const today = new Date();
-    const isReply = this.props.route.params.isReply;
-    const chatId = `${userData.uid}_${otherData.uid}`;
-    const chatIdReply = route.params.roomRef;
-    const idDoc = getDateTime(today);
+    const {otherData} = this.props;
+    const userId = auth().currentUser.uid;
     firestore()
       .collection('Chatting')
-      .doc(chatIdReply ? chatIdReply : chatId)
-      .collection('allChat')
+      .doc(userId)
+      .collection(otherData.uid)
       .onSnapshot((querySnapshot) => {
         let newDataChat = [];
+        console.log('masih disini', querySnapshot, otherData.uid, userId);
         querySnapshot.docs.forEach((documentSnapshot) => {
-          const data = documentSnapshot.data();
+          const data = {
+            ...documentSnapshot.data(),
+            idDocRef: documentSnapshot.ref._documentPath._parts[3],
+          };
+          console.log('datas', data);
           newDataChat = [...newDataChat, data];
         });
         this.setState({
@@ -133,16 +108,49 @@ class ChattingScreen extends Component {
         });
       });
   }
+  async _deleteChat(item, data) {
+    const {userData, otherData} = this.props;
+    const today = new Date();
+    const finder = data.findIndex((finder) => finder.chatDate == item.chatDate);
+    if (finder > -1) {
+      data.splice(finder, 1);
+    }
+    const historyContent = data[data.length - 1];
+    const userId = auth().currentUser.uid;
+    const otherId = this.props.otherData.uid;
+    const reqUrl = await firestore()
+      .collection('Chatting')
+      .doc(userId)
+      .collection(otherId)
+      .doc(item.idDocRef);
+    const reqUrlHistory = async (urlMessages, urlHistory) => {
+      return await firestore()
+        .collection('Messages')
+        .doc(urlMessages)
+        .collection('History')
+        .doc(urlHistory);
+    };
+    const deleteChat = reqUrl.delete();
+    const chatHistory = {
+      lastChat: historyContent.chat,
+      lastChatTime: today.getTime(),
+      lastChatTimeShort: getChatTime(today, true),
+      displayName: otherData.displayName,
+    };
+    if (deleteChat) {
+      (await reqUrlHistory(`${userData.uid}`, `${otherData.uid}`)).set(
+        chatHistory,
+      );
+    }
+  }
   componentDidMount() {
     this._getChatting();
   }
   render() {
     const {chatData} = this.state;
     const {navigation, otherData, userData} = this.props;
-    const isReply = this.props.route.params.isReply;
-    const {email, displayName, uid} = otherData;
+    const {displayName} = otherData;
     const {content} = this.state;
-    console.log('date', chatData);
     return (
       <View style={{flex: 1, backgroundColor: colors.white}}>
         <Header
@@ -153,10 +161,29 @@ class ChattingScreen extends Component {
         />
         <View style={styles.content}>
           <ScrollView showsVerticalScrollIndicator={false}>
+            {/* <Text>{JSON.stringify(chatData)}</Text> */}
             <View style={styles.chatbox}>
               {chatData.map((item, key) => {
                 return (
                   <ChatItem
+                    pressAlert={() =>
+                      Alert.alert(
+                        'Delete Message ?',
+                        'The selected messages will only be deleted from your device.',
+                        [
+                          {
+                            text: 'Cancel',
+                            onPress: () => console.log('Cancel Pressed'),
+                            style: 'cancel',
+                          },
+                          {
+                            text: 'OK',
+                            onPress: () => this._deleteChat(item, chatData),
+                          },
+                        ],
+                        {cancelable: false},
+                      )
+                    }
                     text={item.chat}
                     time={item.chatTime}
                     key={item.chatDate}

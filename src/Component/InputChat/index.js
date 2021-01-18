@@ -23,7 +23,11 @@ export default class InputChat extends Component {
         />
         <TouchableHighlight>
           <TouchableOpacity onPress={onPress}>
-            <Icon name="paper-plane" size={25} color={colors.Icon} />
+            <Icon
+              name="paper-plane"
+              size={25}
+              color={value ? colors.icon.plane : colors.Icon}
+            />
           </TouchableOpacity>
         </TouchableHighlight>
       </View>

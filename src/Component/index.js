@@ -7,6 +7,7 @@ import ChatList from './ChatList';
 import InputChat from './InputChat';
 import ContactList from './ContactList';
 import ChatItem from './ChatItem';
+import Label from './Label';
 import CustomText from './CustomText';
 export {
   Button,
@@ -17,6 +18,7 @@ export {
   ContactList,
   CustomText,
   ChatList,
+  Label,
   InputChat,
   ChatItem,
 };

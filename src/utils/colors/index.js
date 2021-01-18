@@ -5,7 +5,7 @@ const pallete = {
   algaegreen: '#26CC64',
   darkgrey: '#919191',
   tomatoRed: '#eb2f06',
-  bluesky: '#0abde3',
+  bluesky: '#2CA4D8',
   softgrey: '#F2F2F2',
   electromagnetic: '#2f3640',
   greentail: '#DCF8C6',
@@ -19,6 +19,9 @@ export const colors = {
     text: pallete.electromagnetic,
     textMe: pallete.electromagnetic,
     boxMe: pallete.greentail,
+  },
+  icon: {
+    plane: pallete.bluesky,
   },
   white: pallete.white,
   user: {

@@ -8,12 +8,39 @@ export default class ChatItem extends Component {
     super(props);
   }
   render() {
-    const {isMe, text, time, key} = this.props;
+    const {
+      isMe,
+      text,
+      time,
+      key,
+      id,
+      pressAlert,
+      isDeleteOther,
+      isDeleteUser,
+    } = this.props;
 
     if (isMe) {
-      return <User text={text} time={time} key={key} />;
+      return (
+        <User
+          isDelete={isDeleteUser}
+          pressAlert={pressAlert}
+          id={id}
+          text={text}
+          time={time}
+          key={key}
+        />
+      );
     } else {
-      return <Other text={text} time={time} key={key} />;
+      return (
+        <Other
+          isDelete={isDeleteOther}
+          pressAlert={pressAlert}
+          id={id}
+          text={text}
+          time={time}
+          key={key}
+        />
+      );
     }
   }
 }

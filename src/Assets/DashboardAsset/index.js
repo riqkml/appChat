@@ -1,3 +1,3 @@
-import People from './people.jpg';
+import People from './people.png';
 
 export {People};

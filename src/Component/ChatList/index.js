@@ -15,8 +15,8 @@ export default class ChatList extends Component {
   render() {
     const {onPress, name, lastChat, key, isReply, time} = this.props;
     return (
-      <TouchableHighlight activeOpacity={0.6} underlayColor="#DDDDDD">
-        <TouchableOpacity key={key} onPress={onPress} style={styles.container}>
+      <TouchableHighlight key={key} activeOpacity={0.6} underlayColor="#DDDDDD">
+        <TouchableOpacity onPress={onPress} style={styles.container}>
           <View>
             <Image source={People} style={styles.imagePhoto} />
           </View>

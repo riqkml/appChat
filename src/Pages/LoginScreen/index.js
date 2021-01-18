@@ -63,7 +63,6 @@ class LoginScreen extends Component {
   async _saveTokenToDatabase(token) {
     // Assume user is already signed in
     const userId = auth().currentUser.uid;
-    console.log('userid', userId);
     // Add the token to the users datastore
     await firestore()
       .collection('Users')

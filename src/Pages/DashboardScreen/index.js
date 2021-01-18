@@ -26,6 +26,7 @@ class DashboardScreen extends Component {
         data.forEach((documentSnapshot) => {
           newDataChat.push({
             id: documentSnapshot.id,
+            uid: documentSnapshot.ref._documentPath._parts[3],
             ...documentSnapshot.data(),
           });
         });
@@ -50,16 +51,15 @@ class DashboardScreen extends Component {
             listChat.map((item, key) => {
               return (
                 <ChatList
-                  key={key}
+                  key={item.lastChatTime}
                   lastChat={item.lastChat}
                   name={item.displayName}
                   isReply={item.isReply}
                   time={item.lastChatTimeShort}
                   onPress={() => {
-                    navigation.navigate('Chatting', {
-                      roomRef: item.roomRef,
-                    });
                     otherData(item);
+                    console.log(item);
+                    navigation.navigate('Chatting');
                   }}
                 />
               );

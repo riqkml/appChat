@@ -5,10 +5,13 @@ import Router from './Router';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {Store, Persistor} from './Redux/store';
-import FlashMessage from 'react-native-flash-message';
+import FlashMessage, {showMessage} from 'react-native-flash-message';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import PushNotification from 'react-native-push-notification';
 import Firebase from '@react-native-firebase/app';
+import messaging from '@react-native-firebase/messaging';
+import {colors, messageAlert} from './utils';
+import {color} from 'react-native-reanimated';
 
 export default class App extends Component {
   componentDidMount() {
@@ -63,6 +66,13 @@ export default class App extends Component {
        */
       requestPermissions: true,
     });
+  }
+  componentDidMount() {
+    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+      const {title, body} = remoteMessage.notification;
+      messageAlert(title, body, 'info', 'top', colors.white, colors.chat.text);
+    });
+    unsubscribe;
   }
   render() {
     return (
