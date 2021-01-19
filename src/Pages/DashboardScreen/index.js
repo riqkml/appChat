@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
-import {Text, StyleSheet, View, Image, ScrollView} from 'react-native';
-import FastImage from 'react-native-fast-image';
+import {StyleSheet, View, Image, ScrollView} from 'react-native';
 import {connect} from 'react-redux';
-import {iconLogo, People} from '../../Assets';
 import {ChatList, CustomText, Header} from '../../Component';
 import firestore from '@react-native-firebase/firestore';
+import {fireUser} from '../../utils';
 
 class DashboardScreen extends Component {
   constructor(props) {
@@ -51,14 +50,13 @@ class DashboardScreen extends Component {
             listChat.map((item, key) => {
               return (
                 <ChatList
-                  key={item.lastChatTime}
+                  key={key}
                   lastChat={item.lastChat}
                   name={item.displayName}
                   isReply={item.isReply}
                   time={item.lastChatTimeShort}
                   onPress={() => {
                     otherData(item);
-                    console.log(item);
                     navigation.navigate('Chatting');
                   }}
                 />

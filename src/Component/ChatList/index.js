@@ -10,12 +10,15 @@ import {
 import {Gap} from '..';
 import {People} from '../../Assets';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {colors, fonts} from '../../utils';
+import {colors, fonts, Height, Width} from '../../utils';
 export default class ChatList extends Component {
   render() {
-    const {onPress, name, lastChat, key, isReply, time} = this.props;
+    const {onPress, name, lastChat, keys, isReply, time, isOnline} = this.props;
     return (
-      <TouchableHighlight key={key} activeOpacity={0.6} underlayColor="#DDDDDD">
+      <TouchableHighlight
+        key={keys}
+        activeOpacity={0.6}
+        underlayColor="#DDDDDD">
         <TouchableOpacity onPress={onPress} style={styles.container}>
           <View>
             <Image source={People} style={styles.imagePhoto} />

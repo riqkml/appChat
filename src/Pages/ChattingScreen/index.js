@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, ScrollView, Alert} from 'react-native';
+import {StyleSheet, View, ScrollView, Alert, Text} from 'react-native';
 import {connect} from 'react-redux';
 import {People} from '../../Assets';
 import {ChatItem, Header, InputChat} from '../../Component';
@@ -7,6 +7,7 @@ import auth from '@react-native-firebase/auth';
 import {
   colors,
   configAPI,
+  fireRequest,
   fonts,
   getChatTime,
   getDateTime,
@@ -20,9 +21,10 @@ class ChattingScreen extends Component {
     this.state = {
       content: '',
       chatData: [],
+      isOnline: false,
     };
   }
-  _chatSend() {
+  async _chatSend() {
     const {content} = this.state;
     const {userData, otherData, route, apiKey} = this.props;
     const today = new Date();
@@ -37,41 +39,46 @@ class ChattingScreen extends Component {
     };
     const receiverToken = otherData.tokens ? otherData.tokens[0] : '';
 
-    const forUser = {
-      ...otherData,
+    const forHistory = {
       lastChatTime: today.getTime(),
       lastChatTimeShort: getChatTime(today, true),
       lastChat: content,
     };
-    const forOther = {
-      lastChatTime: today.getTime(),
-      lastChatTimeShort: getChatTime(today, true),
-      lastChat: content,
-      ...userData,
-    };
+    console.log(
+      {
+        ...forHistory,
+        ...userData,
+      },
+      {
+        ...otherData,
+        ...forHistory,
+      },
+    );
     if (content) {
-      firestore()
-        .collection('Chatting')
-        .doc(userId)
-        .collection(otherData.uid)
-        .add(dataChat);
-      firestore()
-        .collection('Chatting')
-        .doc(otherData.uid)
-        .collection(userId)
-        .add(dataChat);
-      firestore()
-        .collection('Messages')
-        .doc(`${otherData.uid}`)
-        .collection('History')
-        .doc(`${userData.uid}`)
-        .set(forOther);
-      firestore()
-        .collection('Messages')
-        .doc(`${userData.uid}`)
-        .collection('History')
-        .doc(`${otherData.uid}`)
-        .set(forUser);
+      await fireRequest('Chatting', userId, otherData.uid, dataChat);
+      await fireRequest('Chatting', otherData.uid, userId, dataChat);
+      await fireRequest(
+        'Messages',
+        otherData.uid,
+        'History',
+        {
+          ...forHistory,
+          ...userData,
+        },
+        userId,
+        true,
+      );
+      await fireRequest(
+        'Messages',
+        userId,
+        'History',
+        {
+          ...otherData,
+          ...forHistory,
+        },
+        otherData.uid,
+        true,
+      );
       //user
       Axios.post(
         'https://fcm.googleapis.com/fcm/send',
@@ -92,7 +99,6 @@ class ChattingScreen extends Component {
       .collection(otherData.uid)
       .onSnapshot((querySnapshot) => {
         let newDataChat = [];
-        console.log('masih disini', querySnapshot, otherData.uid, userId);
         querySnapshot.docs.forEach((documentSnapshot) => {
           const data = {
             ...documentSnapshot.data(),
@@ -143,25 +149,36 @@ class ChattingScreen extends Component {
       );
     }
   }
+  _getStatus() {
+    const {otherData} = this.props;
+    firestore()
+      .collection('Users')
+      .doc(otherData.uid)
+      .onSnapshot((querySnapshot) => {
+        this.setState({isOnline: querySnapshot.data().isOnline});
+      });
+  }
   componentDidMount() {
     this._getChatting();
+    this._getStatus();
   }
   render() {
     const {chatData} = this.state;
     const {navigation, otherData, userData} = this.props;
     const {displayName} = otherData;
-    const {content} = this.state;
+    const {content, isOnline} = this.state;
     return (
       <View style={{flex: 1, backgroundColor: colors.white}}>
         <Header
           goBack={() => navigation.navigate('mainApp')}
           photo={People}
           name={displayName}
+          isOnline={isOnline}
           isChatting
         />
         <View style={styles.content}>
           <ScrollView showsVerticalScrollIndicator={false}>
-            {/* <Text>{JSON.stringify(chatData)}</Text> */}
+            <Text>{JSON.stringify(isOnline)}</Text>
             <View style={styles.chatbox}>
               {chatData.map((item, key) => {
                 return (

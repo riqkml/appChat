@@ -7,7 +7,16 @@ import {colors, fonts} from '../../utils';
 
 export default class Header extends Component {
   render() {
-    const {name, email, photo, isChatting, goBack, label, spacing} = this.props;
+    const {
+      name,
+      email,
+      photo,
+      isChatting,
+      goBack,
+      label,
+      spacing,
+      isOnline,
+    } = this.props;
     return (
       <View style={styles.headerWrapper(spacing)}>
         {isChatting && (
@@ -29,7 +38,7 @@ export default class Header extends Component {
                 source={photo}
                 style={{width: 40, height: 40, borderRadius: 20}}
               />
-              <View style={styles.status} />
+              <View style={styles.status(isOnline)} />
             </View>
           </View>
         )}
@@ -38,7 +47,9 @@ export default class Header extends Component {
             {isChatting ? name : label}
           </CustomText>
           {isChatting && (
-            <CustomText style={styles.subLabel}>Online</CustomText>
+            <CustomText style={styles.subLabel}>
+              {isOnline ? 'Online' : 'Offline'}
+            </CustomText>
           )}
         </View>
         <TouchableHighlight
@@ -91,13 +102,13 @@ const styles = StyleSheet.create({
     color: colors.chat.text,
     letterSpacing: 0.5,
   },
-  status: {
+  status: (isOnline) => ({
     width: 10,
     height: 10,
     borderRadius: 8,
     position: 'absolute',
     bottom: 8,
     right: 8,
-    backgroundColor: colors.user.online,
-  },
+    backgroundColor: isOnline ? colors.user.online : colors.user.offline,
+  }),
 });

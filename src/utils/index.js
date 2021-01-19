@@ -4,4 +4,5 @@ export * from './fonts';
 export * from './Storage';
 export * from './Date';
 export * from './config';
+export * from './Firestore';
 export * from './Size';

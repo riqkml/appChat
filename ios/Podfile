@@ -10,6 +10,8 @@ target 'ChatBox' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
+
   target 'ChatBoxTests' do
     inherit! :complete
     # Pods for testing

@@ -1,2 +1,24 @@
 token emulator
 c23sXh3KQkuLbqEgn6iqpo:APA91bHC0q3zWsisg53RfXRk9RXpYg-PTcsiVHZXRxvBpkaPG1glOICxhPlSbJgKyPgfnzNTZ0-YRzNsK9aUSyd5jZfsx8pmfnpOONYUpksP5Pnge-3FWbRXg9EUDe2UMKDrQbMl5QzJ
+  // firestore()
+      //   .collection('Chatting')
+      //   .doc(userId)
+      //   .collection(otherData.uid)
+      //   .add(dataChat);
+      // firestore()
+      //   .collection('Chatting')
+      //   .doc(otherData.uid)
+      //   .collection(userId)
+      //   .add(dataChat);
+      // firestore()
+      //   .collection('Messages')
+      //   .doc(`${otherData.uid}`)
+      //   .collection('History')
+      //   .doc(`${userData.uid}`)
+      //   .set(forOther);
+      // firestore()
+      //   .collection('Messages')
+      //   .doc(`${userData.uid}`)
+      //   .collection('History')
+      //   .doc(`${otherData.uid}`)
+      //   .set(forUser);

@@ -8,11 +8,8 @@ import {connect} from 'react-redux';
 class SplashScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      initializing: true,
-      user: null,
-    };
   }
+
   componentDidMount() {
     auth().onAuthStateChanged(async (user) => {
       if (user) {
@@ -36,6 +33,7 @@ class SplashScreen extends Component {
       }
     });
   }
+
   render() {
     return (
       <View style={styles.page}>

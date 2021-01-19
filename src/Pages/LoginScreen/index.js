@@ -35,7 +35,7 @@ class LoginScreen extends Component {
   }
   _submitData() {
     const {email, password} = this.state;
-    const {dataLogin, navigation} = this.props;
+    const {navigation} = this.props;
     if (email == '' || password == '') {
       messageAlert('Alert', 'incomplete form', 'danger');
     } else {

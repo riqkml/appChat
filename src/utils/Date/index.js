@@ -1,7 +1,7 @@
 const getChatTime = (today, isChat) => {
   const hour = today.getHours();
   const minute = today.getMinutes();
-  const time = isChat && hour >= 12 ? 'AM' : 'PM';
+  const time = isChat && hour >= 12 ? 'PM' : 'AM';
   return `${hour}:${minute} ${time}`;
 };
 const getChatDocument = (today) => {

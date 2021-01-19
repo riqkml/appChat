@@ -11,7 +11,9 @@ import PushNotification from 'react-native-push-notification';
 import Firebase from '@react-native-firebase/app';
 import messaging from '@react-native-firebase/messaging';
 import {colors, messageAlert} from './utils';
-import {color} from 'react-native-reanimated';
+import NetInfo from '@react-native-community/netinfo';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 export default class App extends Component {
   componentDidMount() {
@@ -66,13 +68,28 @@ export default class App extends Component {
        */
       requestPermissions: true,
     });
-  }
-  componentDidMount() {
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
       const {title, body} = remoteMessage.notification;
       messageAlert(title, body, 'info', 'top', colors.white, colors.chat.text);
     });
     unsubscribe;
+
+    const unsubscribeNet = NetInfo.addEventListener((state) => {
+      const userId = auth().currentUser.uid;
+      if (state.type && userId) {
+        firestore().collection('Users').doc(userId).update({
+          isOnline: true,
+        });
+      } else {
+        userId &&
+          firestore().collection('Users').doc(userId).update({
+            isOnline: false,
+          });
+      }
+      console.log('Connection type', state.type);
+      console.log('Is connected?', state.isConnected);
+    });
+    unsubscribeNet;
   }
   render() {
     return (

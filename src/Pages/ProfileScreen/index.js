@@ -16,6 +16,9 @@ class Profile extends Component {
       tokens: firestore.FieldValue.delete(),
     });
     auth().signOut();
+    firestore().collection('Users').doc(userId).update({
+      isOnline: false,
+    });
     this.props.navigation.replace('Login');
   }
   render() {
