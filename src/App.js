@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import Router from './Router';
-import {Provider} from 'react-redux';
+import {connect, Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {Store, Persistor} from './Redux/store';
 import FlashMessage, {showMessage} from 'react-native-flash-message';
@@ -10,84 +10,32 @@ import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import PushNotification from 'react-native-push-notification';
 import Firebase from '@react-native-firebase/app';
 import messaging from '@react-native-firebase/messaging';
-import {colors, messageAlert} from './utils';
+import {colors, getData, messageAlert} from './utils';
 import NetInfo from '@react-native-community/netinfo';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
 export default class App extends Component {
   componentDidMount() {
-    Firebase.initializeApp(this);
-    // Must be outside of any component LifeCycle (such as `componentDidMount`).
-    PushNotification.configure({
-      // (optional) Called when Token is generated (iOS and Android)
-      onRegister: function (token) {
-        console.log('TOKEN:', token);
-      },
-
-      // (required) Called when a remote is received or opened, or local notification is opened
-      onNotification: function (notification) {
-        console.log('NOTIFICATION:', notification);
-
-        // process the notification
-
-        // (required) Called when a remote is received or opened, or local notification is opened
-        notification.finish(PushNotificationIOS.FetchResult.NoData);
-      },
-
-      // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
-      onAction: function (notification) {
-        console.log('ACTION:', notification.action);
-        console.log('NOTIFICATION:', notification);
-
-        // process the action
-      },
-
-      // (optional) Called when the user fails to register for remote notifications. Typically occurs when APNS is having issues, or the device is a simulator. (iOS)
-      onRegistrationError: function (err) {
-        console.error(err.message, err);
-      },
-
-      // IOS ONLY (optional): default: all - Permissions to register.
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-
-      // Should the initial notification be popped automatically
-      // default: true
-      popInitialNotification: true,
-
-      /**
-       * (optional) default: true
-       * - Specified if permissions (ios) and token (android and ios) will requested or not,
-       * - if not, you must call PushNotificationsHandler.requestPermissions() later
-       * - if you are not using remote notification or do not have Firebase installed, use this:
-       *     requestPermissions: Platform.OS === 'ios'
-       */
-      requestPermissions: true,
-    });
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
       const {title, body} = remoteMessage.notification;
+      console.log('ada', remoteMessage);
       messageAlert(title, body, 'info', 'top', colors.white, colors.chat.text);
     });
     unsubscribe;
 
-    const unsubscribeNet = NetInfo.addEventListener((state) => {
-      const userId = auth().currentUser.uid;
-      if (state.type && userId) {
-        firestore().collection('Users').doc(userId).update({
+    const unsubscribeNet = NetInfo.addEventListener(async (state) => {
+      const isLogin = await getData('uDetail');
+      console.log('isLogin', state);
+      if (state.isConnected && isLogin) {
+        firestore().collection('Users').doc(isLogin.uid).update({
           isOnline: true,
         });
-      } else {
-        userId &&
-          firestore().collection('Users').doc(userId).update({
-            isOnline: false,
-          });
+      } else if (state.isConnected == false && isLogin) {
+        firestore().collection('Users').doc(isLogin.uid).update({
+          isOnline: false,
+        });
       }
-      console.log('Connection type', state.type);
-      console.log('Is connected?', state.isConnected);
     });
     unsubscribeNet;
   }

@@ -11,6 +11,7 @@ class SplashScreen extends Component {
   }
 
   componentDidMount() {
+    storeData('uDetail', false);
     auth().onAuthStateChanged(async (user) => {
       if (user) {
         const id = user.uid;

@@ -1,7 +1,14 @@
 import {showMessage} from 'react-native-flash-message';
 import {color} from 'react-native-reanimated';
 
-const messageAlert = (msg, desc, type, position, backgroundColor, color) => {
+export const messageAlert = (
+  msg,
+  desc,
+  type,
+  position,
+  backgroundColor,
+  color,
+) => {
   return showMessage({
     message: msg,
     description: desc,
@@ -12,4 +19,3 @@ const messageAlert = (msg, desc, type, position, backgroundColor, color) => {
     position: position ? position : 'bottom',
   });
 };
-export {messageAlert};

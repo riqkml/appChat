@@ -7,10 +7,10 @@ export default class Button extends Component {
     super(props);
   }
   render() {
-    const {onClick, margin, label} = this.props;
+    const {onClick, margin, label, style} = this.props;
     return (
       <TouchableOpacity onPress={onClick} style={styles.Button(margin)}>
-        <Text style={styles.Title}>{label}</Text>
+        <Text style={[styles.Title, ...style]}>{label}</Text>
       </TouchableOpacity>
     );
   }

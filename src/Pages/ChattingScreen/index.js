@@ -44,17 +44,8 @@ class ChattingScreen extends Component {
       lastChatTimeShort: getChatTime(today, true),
       lastChat: content,
     };
-    console.log(
-      {
-        ...forHistory,
-        ...userData,
-      },
-      {
-        ...otherData,
-        ...forHistory,
-      },
-    );
     if (content) {
+      this.setState({content: ''});
       await fireRequest('Chatting', userId, otherData.uid, dataChat);
       await fireRequest('Chatting', otherData.uid, userId, dataChat);
       await fireRequest(
@@ -85,7 +76,6 @@ class ChattingScreen extends Component {
         notificationData(userData.displayName, content, receiverToken),
         configAPI,
       );
-      this.setState({content: ''});
     } else {
       this.setState({content: ''});
     }
@@ -104,7 +94,6 @@ class ChattingScreen extends Component {
             ...documentSnapshot.data(),
             idDocRef: documentSnapshot.ref._documentPath._parts[3],
           };
-          console.log('datas', data);
           newDataChat = [...newDataChat, data];
         });
         this.setState({
@@ -178,11 +167,11 @@ class ChattingScreen extends Component {
         />
         <View style={styles.content}>
           <ScrollView showsVerticalScrollIndicator={false}>
-            <Text>{JSON.stringify(isOnline)}</Text>
             <View style={styles.chatbox}>
               {chatData.map((item, key) => {
                 return (
                   <ChatItem
+                    keys={key}
                     pressAlert={() =>
                       Alert.alert(
                         'Delete Message ?',
@@ -203,7 +192,7 @@ class ChattingScreen extends Component {
                     }
                     text={item.chat}
                     time={item.chatTime}
-                    key={item.chatDate}
+                    keys={item.chatDate}
                     isMe={item.sendBy === userData.uid}
                   />
                 );

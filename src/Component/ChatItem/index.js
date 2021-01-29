@@ -12,7 +12,7 @@ export default class ChatItem extends Component {
       isMe,
       text,
       time,
-      key,
+      keys,
       id,
       pressAlert,
       isDeleteOther,
@@ -27,7 +27,7 @@ export default class ChatItem extends Component {
           id={id}
           text={text}
           time={time}
-          key={key}
+          keys={keys}
         />
       );
     } else {
@@ -38,7 +38,7 @@ export default class ChatItem extends Component {
           id={id}
           text={text}
           time={time}
-          key={key}
+          keys={keys}
         />
       );
     }

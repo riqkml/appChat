@@ -4,11 +4,11 @@ import {colors, fonts} from '../../utils';
 
 export default class Other extends Component {
   render() {
-    const {text, time, key, id, pressAlert} = this.props;
+    const {text, time, keys, id, pressAlert} = this.props;
     return (
       <TouchableOpacity
         onLongPress={pressAlert}
-        key={key}
+        key={keys}
         style={styles.container}>
         <View style={styles.chatContent}>
           <Text style={styles.text}>{text}</Text>

@@ -4,11 +4,11 @@ import {colors, fonts} from '../../utils';
 
 export default class User extends Component {
   render() {
-    const {text, time, key, pressAlert, isDelete} = this.props;
+    const {text, time, keys, pressAlert, isDelete} = this.props;
 
     return (
       <TouchableOpacity
-        key={key}
+        key={keys}
         onLongPress={pressAlert}
         style={styles.container}>
         <View style={styles.chatContent}>

@@ -50,6 +50,10 @@ class LoginScreen extends Component {
               ...userData,
             },
           });
+          const auths = auth().currentUser.uid;
+          firestore().collection('Users').doc(auths).update({
+            isOnline: true,
+          });
           const userToken = await messaging().getToken();
           userToken && this._saveTokenToDatabase(userToken);
           navigation.replace('mainApp');

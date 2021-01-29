@@ -15,10 +15,11 @@ class Profile extends Component {
     await firestore().collection('Users').doc(userId).update({
       tokens: firestore.FieldValue.delete(),
     });
-    auth().signOut();
     firestore().collection('Users').doc(userId).update({
       isOnline: false,
     });
+    auth().signOut();
+
     this.props.navigation.replace('Login');
   }
   render() {
